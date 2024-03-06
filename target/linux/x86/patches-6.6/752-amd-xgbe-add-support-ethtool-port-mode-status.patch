@@ -1,0 +1,73 @@
+From 7f220eadca6c12d1d43daf7928a49e1d4edd2068 Mon Sep 17 00:00:00 2001
+From: Kristian Skramstad <kristian+github@83.no>
+Date: Mon, 30 Dec 2024 20:20:05 +0100
+Subject: [PATCH] amd-xgbe: add support for ethtool port mode status.
+
+Ethtool port mode status was always NONE.
+Lets update that with TP or PORT_FIBRE.
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 3 ++-
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c  | 4 ++++
+ drivers/net/ethernet/amd/xgbe/xgbe.h         | 2 ++
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+@@ -323,7 +323,7 @@ static int xgbe_get_link_ksettings(struc
+ 	}
+ 
+ 	cmd->base.autoneg = pdata->phy.autoneg;
+-	cmd->base.port = PORT_NONE;
++	cmd->base.port = pdata->phy.port;
+ 
+ 	XGBE_LM_COPY(cmd, supported, lks, supported);
+ 	XGBE_LM_COPY(cmd, advertising, lks, advertising);
+@@ -386,6 +386,7 @@ static int xgbe_set_link_ksettings(struc
+ 
+ 	ret = 0;
+ 	pdata->phy.autoneg = cmd->base.autoneg;
++	pdata->phy.port = cmd->base.port;
+ 	pdata->phy.speed = speed;
+ 	pdata->phy.duplex = cmd->base.duplex;
+ 	linkmode_copy(lks->link_modes.advertising, advertising);
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+@@ -841,6 +841,7 @@ static void xgbe_phy_sfp_phy_settings(st
+ 		pdata->phy.duplex = DUPLEX_UNKNOWN;
+ 		pdata->phy.autoneg = AUTONEG_ENABLE;
+ 		pdata->phy.pause_autoneg = AUTONEG_ENABLE;
++		pdata->phy.port = PORT_NONE;
+ 
+ 		XGBE_SET_SUP(lks, Autoneg);
+ 		XGBE_SET_SUP(lks, Pause);
+@@ -931,6 +932,7 @@ static void xgbe_phy_sfp_phy_settings(st
+ 		pdata->phy.duplex = DUPLEX_UNKNOWN;
+ 		pdata->phy.autoneg = AUTONEG_DISABLE;
+ 		pdata->phy.pause_autoneg = AUTONEG_DISABLE;
++		pdata->phy.port = PORT_NONE;
+ 		break;
+ 	}
+ 
+@@ -939,9 +941,11 @@ static void xgbe_phy_sfp_phy_settings(st
+ 	case XGBE_SFP_BASE_1000_CX:
+ 	case XGBE_SFP_BASE_10000_CR:
+ 		XGBE_SET_SUP(lks, TP);
++		pdata->phy.port = PORT_TP;
+ 		break;
+ 	default:
+ 		XGBE_SET_SUP(lks, FIBRE);
++		pdata->phy.port = PORT_FIBRE;
+ 		break;
+ 	}
+ 
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -654,6 +654,8 @@ struct xgbe_phy {
+ 	int pause_autoneg;
+ 	int tx_pause;
+ 	int rx_pause;
++
++	int port;
+ };
+ 
+ enum xgbe_i2c_cmd {
