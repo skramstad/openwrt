@@ -280,14 +280,12 @@
 };
 
 &eth0 {
-	compatible = "qca,qca9560-eth", "syscon";
+	compatible = "qca,qca9560-eth";
 
-	pll-data = <0x03000000 0x00000101 0x00001919>;
-	pll-reg = <0 0x48 0>;
-	pll-handle = <&pll>;
-
-	resets = <&rst 9>;
-	reset-names = "mac";
+	resets = <&rst 9>, <&rst 22>;
+	reset-names = "mac", "mdio";
+	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_REF>;
+	clock-names = "eth", "mdio";
 };
 
 &mdio1 {
@@ -327,8 +325,10 @@
 
 	phy-mode = "gmii";
 
-	resets = <&rst 13>;
-	reset-names = "mac";
+	resets = <&rst 13>, <&rst 23>;
+	reset-names = "mac", "mdio";
+	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_REF>;
+	clock-names = "eth", "mdio";
 
 	fixed-link {
 		speed = <1000>;

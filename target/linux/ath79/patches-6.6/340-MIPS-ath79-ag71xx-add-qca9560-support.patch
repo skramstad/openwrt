@@ -1,0 +1,53 @@
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -335,6 +335,7 @@ enum ag71xx_type {
+ 	AR9340,
+ 	QCA9530,
+ 	QCA9550,
++	QCA9560,
+ };
+ 
+ struct ag71xx_dcfg {
+@@ -638,7 +639,11 @@ static int ag71xx_mdio_get_divider(struc
+ 	if (!ref_clock)
+ 		return -EINVAL;
+ 
+-	if (ag71xx_is(ag, AR9330) || ag71xx_is(ag, AR9340)) {
++	if (ag71xx_is(ag, AR9330) || 
++	    ag71xx_is(ag, AR9340) || 
++	    ag71xx_is(ag, QCA9530) || 
++	    ag71xx_is(ag, QCA9550) || 
++	    ag71xx_is(ag, QCA9560)) {
+ 		table = ar933x_mdio_div_table;
+ 		ndivs = ARRAY_SIZE(ar933x_mdio_div_table);
+ 	} else if (ag71xx_is(ag, AR7240)) {
+@@ -1104,7 +1109,8 @@ static int ag71xx_phylink_setup(struct a
+ 	if ((ag71xx_is(ag, AR9330) && ag->mac_idx == 0) ||
+ 	    ag71xx_is(ag, AR9340) ||
+ 	    ag71xx_is(ag, QCA9530) ||
+-	    (ag71xx_is(ag, QCA9550) && ag->mac_idx == 1))
++	    (ag71xx_is(ag, QCA9550) && ag->mac_idx == 1) ||
++	    (ag71xx_is(ag, QCA9560) && ag->mac_idx == 1))
+ 		__set_bit(PHY_INTERFACE_MODE_MII,
+ 			  ag->phylink_config.supported_interfaces);
+ 
+@@ -1114,7 +1120,8 @@ static int ag71xx_phylink_setup(struct a
+ 		__set_bit(PHY_INTERFACE_MODE_GMII,
+ 			  ag->phylink_config.supported_interfaces);
+ 
+-	if (ag71xx_is(ag, QCA9550) && ag->mac_idx == 0)
++	if ((ag71xx_is(ag, QCA9550) && ag->mac_idx == 0) ||
++	    (ag71xx_is(ag, QCA9560) && ag->mac_idx == 0))
+ 		__set_bit(PHY_INTERFACE_MODE_SGMII,
+ 			  ag->phylink_config.supported_interfaces);
+ 
+@@ -1123,7 +1130,8 @@ static int ag71xx_phylink_setup(struct a
+ 			  ag->phylink_config.supported_interfaces);
+ 
+ 	if ((ag71xx_is(ag, AR9340) && ag->mac_idx == 0) ||
+-	    (ag71xx_is(ag, QCA9550) && ag->mac_idx == 1))
++	    (ag71xx_is(ag, QCA9550) && ag->mac_idx == 1) ||
++	    (ag71xx_is(ag, QCA9560) && ag->mac_idx == 1))
+ 		__set_bit(PHY_INTERFACE_MODE_RGMII,
+ 			  ag->phylink_config.supported_interfaces);
+ 

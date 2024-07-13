@@ -147,22 +147,90 @@
 &mdio0 {
 	status = "okay";
 
-	phy0: ethernet-phy@0 {
-		reg = <0>;
-		phy-mode = "sgmii";
+	#address-cells = <1>;
+	#size-cells = <0>;
 
-		qca,ar8327-initvals = <
-			0x04 0x00000080 /* AR8327_REG_PAD0_MODE */
-			0x08 0x00000000 /* PORT5 PAD MODE CTRL */
-			0x0c 0x00000000 /* PORT6 PAD MODE CTRL */
-			0x10 0x602613a0 /* AR8327_REG_POWER_ON_STRAP */
-			0x50 0xcc35cc35 /* AR8327_REG_LED_CTRL0 */
-			0x54 0xca35ca35 /* AR8327_REG_LED_CTRL1 */
-			0x58 0xc935c935 /* AR8327_REG_LED_CTRL2 */
-			0x5c 0x03ffff00 /* AR8327_REG_LED_CTRL3 */
-			0x7c 0x0000007e /* AR8327_REG_PORT_STATUS(0) */
-			0x94 0x00001080 /* AR8327_REG_PORT_STATUS(6) */
-		>;
+	qca8327_port1: ethernet-phy@0 {
+		reg = <0x0>;
+	};
+
+	qca8327_port2: ethernet-phy@1 {
+		reg = <0x1>;
+	};
+
+	qca8327_port3: ethernet-phy@2 {
+		reg = <0x2>;
+	};
+
+	qca8327_port4: ethernet-phy@3 {
+		reg = <0x3>;
+	};
+
+	qca8327_port5: ethernet-phy@4 {
+		reg = <0x4>;
+	};
+
+	qca8327: switch@10 {
+		compatible = "qca,qca8327";
+		
+		reg = <0x10>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				ethernet = <&eth0>;
+				phy-mode = "sgmii";
+				qca,sgmii-rxclk-falling-edge;
+
+				fixed-link {
+					speed = <1000>;
+					full-duplex;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				label = "wan";
+				phy-handle = <&qca8327_port1>;
+				nvmem-cells = <&macaddr_art_0 0>;
+				nvmem-cell-names = "mac-address";
+			};
+
+			port@2 {
+				reg = <2>;
+				label = "lan1";
+				phy-handle = <&qca8327_port2>;
+				nvmem-cells = <&macaddr_art_0 1>;
+				nvmem-cell-names = "mac-address";
+			};
+
+			port@3 {
+				reg = <3>;
+				label = "lan3";
+				phy-handle = <&qca8327_port3>;
+				nvmem-cells = <&macaddr_art_0 3>;
+				nvmem-cell-names = "mac-address";
+			};
+
+			port@4 {
+				reg = <4>;
+				label = "lan2";
+				phy-handle = <&qca8327_port4>;
+				nvmem-cells = <&macaddr_art_0 2>;
+				nvmem-cell-names = "mac-address";
+			};
+
+			port@5 {
+				reg = <5>;
+				label = "lan4";
+				phy-handle = <&qca8327_port5>;
+				nvmem-cells = <&macaddr_art_0 4>;
+				nvmem-cell-names = "mac-address";
+			};
+		};
 	};
 };
 
@@ -171,11 +239,10 @@
 	
 	pll-data = <0x03000101 0x00000101 0x00001919>;
 
-	phy-mode = "sgmii";
-	phy-handle = <&phy0>;
-
-	nvmem-cells = <&macaddr_art_0 0>;
-	nvmem-cell-names = "mac-address";
+	fixed-link {
+		speed = <1000>;
+		full-duplex;
+	};
 };
 
 &wmac {

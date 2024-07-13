@@ -27,7 +27,9 @@ define Device/ubnt_amplifi-router-hd
   DEVICE_VENDOR := Ubiquiti
   DEVICE_MODEL := AmpliFi Router HD
   UBNT_CHIP := qca956x
-  DEVICE_PACKAGES += kmod-ath10k-ct-smallbuffers ath10k-firmware-qca988x-ct kmod-usb2
+  DEVICE_PACKAGES += kmod-ath10k-ct-smallbuffers ath10k-firmware-qca988x-ct kmod-usb2 \
+   kmod-ag71xx kmod-dsa-qca8k kmod-phy-at803x \
+   -kmod-ag71xx-ds -kmod-switch-ar8xxx -kmod-swconfig -swconfig
 endef
 TARGET_DEVICES += ubnt_amplifi-router-hd
 
