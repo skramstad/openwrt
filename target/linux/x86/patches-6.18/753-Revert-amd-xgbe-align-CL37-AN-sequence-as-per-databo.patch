@@ -1,0 +1,65 @@
+From 4d49d0f04b7736f15d6fb6e703fca9d2a9b41d31 Mon Sep 17 00:00:00 2001
+From: Kristian Skramstad <kristian+github@83.no>
+Date: Sat, 28 Feb 2026 17:05:33 +0100
+Subject: [PATCH 5/5] Revert "amd-xgbe: align CL37 AN sequence as per databook"
+
+This reverts commit 6074bff08ac2243fc0f86bbbf888f2e21ccf03fc.
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h | 2 --
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c   | 9 ---------
+ drivers/net/ethernet/amd/xgbe/xgbe.h        | 4 ++--
+ 3 files changed, 2 insertions(+), 13 deletions(-)
+
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+@@ -1305,8 +1305,6 @@
+ #define MDIO_VEND2_CTRL1_SS13		BIT(13)
+ #endif
+ 
+-#define XGBE_VEND2_MAC_AUTO_SW		BIT(9)
+-
+ /* MDIO mask values */
+ #define XGBE_AN_CL73_INT_CMPLT		BIT(0)
+ #define XGBE_AN_CL73_INC_LINK		BIT(1)
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+@@ -266,10 +266,6 @@ static void xgbe_an37_set(struct xgbe_pr
+ 		reg |= MDIO_VEND2_CTRL1_AN_RESTART;
+ 
+ 	XMDIO_WRITE(pdata, MDIO_MMD_VEND2, MDIO_CTRL1, reg);
+-
+-	reg = XMDIO_READ(pdata, MDIO_MMD_VEND2, MDIO_PCS_DIG_CTRL);
+-	reg |= XGBE_VEND2_MAC_AUTO_SW;
+-	XMDIO_WRITE(pdata, MDIO_MMD_VEND2, MDIO_PCS_DIG_CTRL, reg);
+ }
+ 
+ static void xgbe_an37_restart(struct xgbe_prv_data *pdata)
+@@ -898,11 +894,6 @@ static void xgbe_an37_init(struct xgbe_p
+ 
+ 	netif_dbg(pdata, link, pdata->netdev, "CL37 AN (%s) initialized\n",
+ 		  (pdata->an_mode == XGBE_AN_MODE_CL37) ? "BaseX" : "SGMII");
+-
+-	reg = XMDIO_READ(pdata, MDIO_MMD_AN, MDIO_CTRL1);
+-	reg &= ~MDIO_AN_CTRL1_ENABLE;
+-	XMDIO_WRITE(pdata, MDIO_MMD_AN, MDIO_CTRL1, reg);
+-
+ }
+ 
+ static void xgbe_an73_init(struct xgbe_prv_data *pdata)
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -203,12 +203,12 @@
+ #define XGBE_LINK_TIMEOUT		5
+ #define XGBE_KR_TRAINING_WAIT_ITER	50
+ 
+-#define XGBE_SGMII_AN_LINK_DUPLEX	BIT(1)
++#define XGBE_SGMII_AN_LINK_STATUS	BIT(1)
+ #define XGBE_SGMII_AN_LINK_SPEED	(BIT(2) | BIT(3))
+ #define XGBE_SGMII_AN_LINK_SPEED_10	0x00
+ #define XGBE_SGMII_AN_LINK_SPEED_100	0x04
+ #define XGBE_SGMII_AN_LINK_SPEED_1000	0x08
+-#define XGBE_SGMII_AN_LINK_STATUS	BIT(4)
++#define XGBE_SGMII_AN_LINK_DUPLEX	BIT(4)
+ 
+ /* ECC correctable error notification window (seconds) */
+ #define XGBE_ECC_LIMIT			60
