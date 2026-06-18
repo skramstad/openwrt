@@ -69,7 +69,7 @@ Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 +endif
 --- /dev/null
 +++ b/drivers/net/pcs/airoha/pcs-airoha-common.c
-@@ -0,0 +1,1313 @@
+@@ -0,0 +1,1314 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2024 AIROHA Inc
@@ -1266,7 +1266,8 @@ Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 +	 * manual rx calibration is needed. This is only limited to
 +	 * any SoC revision before E2.
 +	 */
-+	if (device_is_compatible(dev, "airoha,an7581-pcs-eth")) {
++	if (device_is_compatible(dev, "airoha,an7581-pcs-eth") ||
++		device_is_compatible(dev, "airoha,an7581-pcs-pon")) {
 +		u32 val;
 +
 +		ret = regmap_read(priv->scu, AIROHA_SCU_PDIDR, &val);
